@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import { ArtistData } from "../services/apiArtists";
+import Button from "../ui/Button";
 
 const FormContainer = styled.form`
   display: flex;
@@ -41,26 +42,6 @@ const ErrorMessage = styled.p`
   color: #ef4444;
 `;
 
-const SubmitButton = styled.button`
-  padding: 0.8rem;
-  background: #4f46e5;
-  color: white;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-
-  &:hover {
-    background: #4338ca;
-  }
-
-  &:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-  }
-`;
-
 interface FormData {
   name: string;
   facebook: string;
@@ -68,16 +49,28 @@ interface FormData {
   spotify: string;
   soundcloud: string;
 }
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  width: 100%;
+`;
+
 interface UserFormProps {
-  currentArtist: ArtistData;
+  format: string | null;
+  currentArtist?: ArtistData;
+  onRequestClose: () => void;
 }
 
-function UserForm({ currentArtist }: UserFormProps) {
-  const { name, facebook, vk, spotify, soundcloud } = currentArtist;
+function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
+  const { name, facebook, vk, spotify, soundcloud } = currentArtist ?? {};
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
+
+    reset,
   } = useForm<FormData>({
     defaultValues: {
       name,
@@ -88,17 +81,41 @@ function UserForm({ currentArtist }: UserFormProps) {
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log("Entered data:", data);
-  };
+  function onSubmit(data: FormData) {
+    if (format === "Add") {
+      return;
+    }
 
+    if (isDirty && currentArtist) {
+      const isDataChanged = Object.keys(data).some((key) => {
+        const typedKey = key as keyof FormData;
+
+        return data[typedKey] !== currentArtist[typedKey];
+      });
+
+      if (isDataChanged) {
+        console.log("Entered data:", data);
+      } else {
+        console.log("No changes detected");
+      }
+    }
+
+    reset();
+    onRequestClose();
+  }
+
+  function onCencel(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    reset();
+    onRequestClose();
+  }
   return (
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
       <div>
         <Label>Имя</Label>
         <InputField
-          {...register("name", { required: "Имя is compulsory" })}
-          placeholder="Enter имя"
+          {...register("name", { required: "Name is compulsory" })}
+          placeholder="Enter name"
         />
         {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
       </div>
@@ -146,7 +163,19 @@ function UserForm({ currentArtist }: UserFormProps) {
         )}
       </div>
 
-      <SubmitButton type="submit">Submit</SubmitButton>
+      <ButtonContainer>
+        <Button
+          $variations="secondary"
+          $size="medium"
+          type="button"
+          onClick={onCencel}
+        >
+          Cancel
+        </Button>
+        <Button $variations="primary" $size="medium" type="submit">
+          {format} Artist
+        </Button>
+      </ButtonContainer>
     </FormContainer>
   );
 }

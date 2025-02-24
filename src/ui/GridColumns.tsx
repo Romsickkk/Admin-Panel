@@ -9,14 +9,25 @@ import {
 } from "ag-grid-community";
 
 import Spinner from "./Spiner";
-import AgModal from "./AgModal";
+import AgFormModal from "./AgFormModal";
 import AgGridWrapper from "./AgGridWrapper";
+import AddArtistButton from "./AddArtistButton";
+
+export type ModalType = "Edit" | "Delete" | "Add" | null;
 
 function AgGridComponent() {
   const { data, error, isLoading, refetch } = useGetTableDataQuery();
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentArtist, setCurrentArtist] = useState<ArtistData | null>(null);
-  console.log(currentArtist);
+
+  function openModal(modalName: ModalType) {
+    setCurrentModal(modalName);
+  }
+
+  function closeModal() {
+    setCurrentModal(null);
+    setCurrentArtist(null);
+  }
 
   if (isLoading) return <Spinner />;
 
@@ -26,25 +37,23 @@ function AgGridComponent() {
     return <p>{errorMessage}</p>;
   }
 
-  function openEditModal() {
-    setModalOpen(true);
-  }
-
-  function closeEditModal() {
-    setModalOpen(false);
-  }
-
-  function changeCurrentArtist(artist: ArtistData | null): void {
-    setCurrentArtist(artist);
-  }
-
   return (
-    <>
+    <div>
+      <div
+        style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}
+      >
+        <AddArtistButton changeModal={openModal} />
+      </div>
+
       <AgGridWrapper className="ag-theme-alpine-dark">
         <AgGridReact
           columnDefs={columnDefs}
           rowData={data}
-          context={{ openEditModal, changeCurrentArtist }}
+          context={{
+            openModal,
+            changeCurrentArtist: (artist: ArtistData) =>
+              setCurrentArtist(artist),
+          }}
           modules={[
             CellStyleModule,
             ClientSideRowModelModule,
@@ -52,15 +61,19 @@ function AgGridComponent() {
           ]}
         />
       </AgGridWrapper>
-      <button onClick={() => refetch()}>Refetch</button>
 
-      <AgModal
-        isOpen={modalOpen}
-        onRequestClose={closeEditModal}
+      <AgFormModal
+        modalName={currentModal}
+        onRequestClose={closeModal}
         currentArtist={currentArtist}
-        setCurrentArtist={setCurrentArtist}
       />
-    </>
+      <button
+        onClick={() => refetch()}
+        style={{ padding: "0.5rem 1rem", borderRadius: "8px" }}
+      >
+        Refetch
+      </button>
+    </div>
   );
 }
 

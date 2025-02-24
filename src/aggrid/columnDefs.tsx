@@ -4,8 +4,18 @@ import { ICellRendererParams } from "ag-grid-community";
 
 import { type ArtistData } from "../services/apiArtists";
 
-import AgButton from "../ui/AgButton";
+import AgEditButton from "../ui/AgEditButton";
 import AgLink from "../ui/AgLink";
+import styled from "styled-components";
+
+// Исправление стилей для EditingButtonsDiv
+const EditingButtonsDiv = styled.div`
+  display: flex;
+  gap: 3px;
+  padding: 0;
+  align-items: center;
+  height: 100%;
+`;
 
 export const columnDefs: ColDef<ArtistData>[] = [
   {
@@ -14,30 +24,22 @@ export const columnDefs: ColDef<ArtistData>[] = [
     cellStyle: { padding: 0 },
     cellRenderer: (params: ICellRendererParams) => {
       return (
-        <div
-          style={{
-            display: "flex",
-            gap: "3px",
-            padding: 0,
-            alignItems: "center",
-            height: "100%",
-          }}
-        >
-          <AgButton
+        <EditingButtonsDiv>
+          <AgEditButton
             name="Edit"
             icon={<FaPen />}
             params={params}
-            modalChange={params.context?.openModal}
-            changeCurrentArtist={params.context?.changeCurrentArtist}
+            modalChange={params.context.openModal}
+            changeCurrentArtist={params.context.changeCurrentArtist}
           />
-          <AgButton
+          <AgEditButton
             name="Delete"
             icon={<FaTrashAlt />}
             params={params}
-            modalChange={params.context?.openModal}
-            changeCurrentArtist={params.context?.changeCurrentArtist}
+            modalChange={params.context.openModal}
+            changeCurrentArtist={params.context.changeCurrentArtist}
           />
-        </div>
+        </EditingButtonsDiv>
       );
     },
     width: 135,
@@ -53,7 +55,7 @@ export const columnDefs: ColDef<ArtistData>[] = [
           src={params.value}
           alt="Artist Avatar"
           style={{
-            width: "40x",
+            width: "40px", // Исправлено с "40x" на "40px"
             height: "40px",
             objectFit: "cover",
             borderRadius: "50%",

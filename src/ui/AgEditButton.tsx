@@ -42,11 +42,11 @@ interface AGButtonProps {
   name: string;
   icon?: ReactNode;
   params: ICellRendererParams;
-  modalChange: () => void;
+  modalChange: (name: string) => void;
   changeCurrentArtist: (artist: ArtistData) => void;
 }
 
-function AGButton({
+function AgEditButton({
   name,
   icon,
   params,
@@ -57,7 +57,7 @@ function AGButton({
     <AgDiv>
       <DivButton
         onClick={() => {
-          modalChange();
+          modalChange(name);
           changeCurrentArtist(params.data);
         }}
       >
@@ -67,4 +67,4 @@ function AGButton({
   );
 }
 
-export default AGButton;
+export default AgEditButton;
