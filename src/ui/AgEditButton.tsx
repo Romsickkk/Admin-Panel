@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { ArtistData } from "../services/apiArtists";
+import { ArtistData } from "../artists/apiArtists";
 import { ICellRendererParams } from "ag-grid-community";
 
 import styled from "styled-components";
@@ -11,32 +11,39 @@ const AgDiv = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
-`;
-
-const DivButton = styled.button`
-  background-color: #111827;
-  color: white;
-  border-radius: 5px;
-  padding: 7px 5px;
-  border: none;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  &:hover {
+  &:hover svg,
+  &:active svg,
+  &.active:link svg,
+  &.active:visited svg {
     color: #ff6e1b;
-  }
-
-  &:active {
-    color: #ff6e1b;
-  }
-
-  &:focus {
-    color: #ff6e1b;
-    outline: 2px solid #ff6e1b;
   }
 `;
+
+// const DivButton = styled.button`
+//   background-color: #111827;
+//   color: white;
+//   border-radius: 5px;
+//   padding: 7px 5px;
+//   border: none;
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   gap: 8px;
+
+//   &:hover {
+//     color: #ff6e1b;
+//   }
+
+//   &:active {
+//     color: #ff6e1b;
+//   }
+
+//   &:focus {
+//     color: #ff6e1b;
+//     outline: 2px solid #ff6e1b;
+//   }
+// `;
 
 interface AGButtonProps {
   name: string;
@@ -54,15 +61,13 @@ function AgEditButton({
   changeCurrentArtist,
 }: AGButtonProps) {
   return (
-    <AgDiv>
-      <DivButton
-        onClick={() => {
-          modalChange(name);
-          changeCurrentArtist(params.data);
-        }}
-      >
-        {icon} {name}
-      </DivButton>
+    <AgDiv
+      onClick={() => {
+        modalChange(name);
+        changeCurrentArtist(params.data);
+      }}
+    >
+      {icon}
     </AgDiv>
   );
 }

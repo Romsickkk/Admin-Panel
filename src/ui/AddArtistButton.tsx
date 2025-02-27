@@ -1,6 +1,6 @@
 import { FaUserPlus } from "react-icons/fa";
 
-import { type ModalType } from "./GridColumns";
+import { type ModalType } from "../artists/AgGridColumns";
 
 import Button from "./Button";
 

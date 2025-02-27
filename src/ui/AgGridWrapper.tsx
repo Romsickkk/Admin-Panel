@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 const AgGridWrapper = styled.div`
-  height: 400px;
+  height: 513px;
   width: 100%;
   background-color: #1f2937;
   color: #ffffff;

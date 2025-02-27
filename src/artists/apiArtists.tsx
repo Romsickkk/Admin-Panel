@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import supabase from "./supabase";
+
+import supabase from "../services/supabase";
 
 export type ArtistData = {
   name: string;
@@ -8,6 +9,8 @@ export type ArtistData = {
   vk: string | undefined;
   spotify: string | undefined;
   soundcloud: string | undefined;
+  instagram: string | undefined;
+  twitter: string | undefined;
   id: number;
 };
 
@@ -22,13 +25,12 @@ export const supabaseApi = createApi({
         if (error) {
           return {
             error: {
-              status: parseInt(error.code) || 500, // Убедимся, что это число
+              status: parseInt(error.code) || 500,
               data: error.message,
             },
           };
         }
 
-        // Преобразуем данные для соответствия типу ArtistData
         const formattedData =
           data?.map((artist) => ({
             ...artist,
@@ -37,11 +39,33 @@ export const supabaseApi = createApi({
             vk: artist.vk ?? undefined,
             spotify: artist.spotify ?? undefined,
             soundcloud: artist.soundcloud ?? undefined,
+            instagram: artist.instagram ?? undefined,
+            twitter: artist.twitter ?? undefined,
           })) || [];
 
         return { data: formattedData };
       },
     }),
+    updateArtist: builder.mutation({
+      query: ({ id, updateValues }) => ({
+        url: "artists",
+        method: "PATCH",
+        body: updateValues,
+        params: {
+          id: `eq.${id}`,
+        },
+      }),
+    }),
+    // Мутация для удаления данных
+    // deleteArtist: builder.mutation({
+    //   query: (id: number) => ({
+    //     url: "artists",
+    //     method: "DELETE",
+    //     params: {
+    //       id: `eq.${id}`, // Фильтрация по ID для удаления конкретной записи
+    //     },
+    //   }),
+    // }),
   }),
 });
 

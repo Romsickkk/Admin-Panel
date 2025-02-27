@@ -1,3 +1,5 @@
+import { FaUser } from "react-icons/fa";
+import { IoLogOut } from "react-icons/io5";
 import styled from "styled-components";
 
 const StyledHeader = styled.header`
@@ -13,8 +15,8 @@ const StyledHeader = styled.header`
 function Header() {
   return (
     <StyledHeader>
-      <p>user avatar</p>
-      <p>header menu</p>
+      <FaUser />
+      <IoLogOut style={{ height: "20px", width: "20px" }} />
     </StyledHeader>
   );
 }

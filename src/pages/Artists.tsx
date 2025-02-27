@@ -1,9 +1,10 @@
-import GridColumns from "../ui/GridColumns";
+import GridColumns from "../artists/AgGridColumns";
 
 function Artists() {
   return (
     <>
       <div>Artists</div>
+
       <GridColumns />
     </>
   );

@@ -60,6 +60,16 @@ const Button = styled.button<ButtonProps>`
   border: none;
   border-radius: var(--border-radius-sm);
   box-shadow: var(--shadow-sm);
+  &:hover {
+    color: #ff6e1b;
+  }
+
+  &:hover svg,
+  &:active svg,
+  &.active:link svg,
+  &.active:visited svg {
+    color: #ff6e1b;
+  }
 
   ${(props) => sizes[props.$size]}
   ${(props) => variations[props.$variations]}

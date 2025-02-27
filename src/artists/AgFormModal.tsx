@@ -1,11 +1,11 @@
-import { ArtistData } from "../services/apiArtists";
+import { ArtistData } from "./apiArtists";
 
 import ReactModal from "react-modal";
 import UserForm from "../aggrid/UserForm";
-import Button from "./Button";
+import Button from "../ui/Button";
 import styled from "styled-components";
 
-import { type ModalType } from "./GridColumns";
+import { type ModalType } from "./AgGridColumns";
 
 interface ModalInterface {
   modalName: ModalType;
@@ -53,70 +53,45 @@ const WarningText = styled.p`
   justify-content: center;
 `;
 
-const Avatar = styled.img`
-  gap: 2px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-left: 10px;
-`;
+// const Avatar = styled.img`
+//   gap: 2px;
+//   width: 40px;
+//   height: 40px;
+//   border-radius: 50%;
+//   margin-left: 10px;
+// `;
 
-function AgFormModal({
-  modalName,
-  onRequestClose,
-  currentArtist,
-}: ModalInterface) {
+function AgFormModal({ modalName, onRequestClose, currentArtist }: ModalInterface) {
   const isOpen = !!modalName;
 
   return (
-    <ReactModal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      contentLabel={`${modalName} Modal`}
-      style={modalStyles}
-    >
+    <ReactModal isOpen={isOpen} onRequestClose={onRequestClose} contentLabel={`${modalName} Modal`} style={modalStyles}>
       {modalName === "Edit" ? (
         <>
           <p>Edit Artist</p>
           {currentArtist && (
-            <UserForm
-              format={modalName}
-              currentArtist={currentArtist}
-              onRequestClose={onRequestClose}
-            />
+            <UserForm format={modalName} currentArtist={currentArtist} onRequestClose={onRequestClose} />
           )}
         </>
       ) : modalName === "Delete" ? (
         <>
           <WarningText>
-            Delete artist{" "}
-            <span style={{ color: "#FF6E1B", margin: "0 5px" }}>
-              {currentArtist?.name}
-            </span>{" "}
-            ?
-            <Avatar src={currentArtist?.avatar} alt="Artist Avatar" />
+            Are you sure to delete artist{" "}
+            <span style={{ color: "#FF6E1B", margin: "0 5px" }}>{currentArtist?.name}</span> ?
           </WarningText>
 
           <ButtonContainer>
-            <Button
-              $variations="secondary"
-              $size="medium"
-              onClick={onRequestClose}
-            >
+            <Button $variations="secondary" $size="medium" onClick={onRequestClose}>
               Cancel
             </Button>
-            <Button
-              $variations="danger"
-              $size="medium"
-              onClick={onRequestClose}
-            >
+            <Button $variations="danger" $size="medium" onClick={onRequestClose}>
               Delete
             </Button>
           </ButtonContainer>
         </>
       ) : (
         <>
-          <p>Add</p>
+          <p>Add Artist</p>
 
           <UserForm format={modalName} onRequestClose={onRequestClose} />
         </>
