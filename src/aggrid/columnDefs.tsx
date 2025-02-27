@@ -2,7 +2,7 @@ import { ColDef } from "ag-grid-community";
 import { FaPen, FaTrashAlt } from "react-icons/fa";
 import { ICellRendererParams } from "ag-grid-community";
 
-import { type ArtistData } from "../services/apiArtists";
+import { type ArtistData } from "../artists/apiArtists";
 
 import AgEditButton from "../ui/AgEditButton";
 import AgLink from "../ui/AgLink";

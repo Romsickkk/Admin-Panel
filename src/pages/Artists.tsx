@@ -4,7 +4,6 @@ function Artists() {
   return (
     <>
       <div>Artists</div>
-
       <GridColumns />
     </>
   );
