@@ -1,12 +1,13 @@
-import { useEffect, useState } from "react";
-import FormRowVertical from "../ui/FormRowVertical";
-import Input from "../ui/Input";
-import Form from "../ui/Form";
-import Button from "../ui/Button";
-import { useLoginMutation } from "../services/apiAuth";
-import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { useLoginMutation } from "../services/apiAuth";
+import { useEffect, useState } from "react";
+
+import Form from "../ui/Form";
+import Input from "../ui/Input";
+import Button from "../ui/Button";
 import toast from "react-hot-toast";
+import styled from "styled-components";
+import FormRowVertical from "../ui/FormRowVertical";
 
 // Переноси создание ErrorWarning сюда, чтобы не пересоздавать его каждый раз
 const ErrorWarning = styled.p`
@@ -59,9 +60,7 @@ function LoginForm() {
         />
       </FormRowVertical>
 
-      {error && "status" in error && typeof error.data === "string" && (
-        <ErrorWarning>{error.data}</ErrorWarning>
-      )}
+      {error && "status" in error && typeof error.data === "string" && <ErrorWarning>{error.data}</ErrorWarning>}
 
       <FormRowVertical>
         <Button $size="large" $variations="primary" disabled={isLoading}>

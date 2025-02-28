@@ -1,4 +1,4 @@
-import { ArtistData } from "./apiArtists";
+import { type ArtistData } from "./apiArtists";
 
 import ReactModal from "react-modal";
 import UserForm from "../aggrid/UserForm";

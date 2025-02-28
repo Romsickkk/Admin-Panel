@@ -5,6 +5,10 @@ import Button from "../ui/Button";
 import styled from "styled-components";
 import { LuImagePlus } from "react-icons/lu";
 import DefaultAvatar from "../assets/default-avatar.png";
+import { useDeleteImageMutation, useUpdateImageMutation } from "../services/apiArtistAvatar";
+import { useImage } from "./useImage";
+import toast from "react-hot-toast";
+import { useUpdateArtistByIdMutation } from "../services/apiArtist";
 
 const FormContainer = styled.form`
   display: flex;
@@ -106,18 +110,24 @@ interface FormData {
   vk: string;
   spotify: string;
   soundcloud: string;
+  instagram: string;
+  twitter: string;
 }
 
 interface UserFormProps {
   format: string | null;
-  currentArtist?: ArtistData;
+  currentArtist: ArtistData;
   onRequestClose: () => void;
 }
 
 function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
-  const { name, facebook, vk, spotify, soundcloud } = currentArtist ?? {};
-  const [avatar, setAvatar] = useState<string>(currentArtist?.avatar || DefaultAvatar);
+  const { id, avatar, name, facebook, vk, spotify, soundcloud, instagram, twitter } = currentArtist ?? {};
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [newAvatar, setNewAvatar] = useState<string>(avatar || DefaultAvatar);
   const [avatarChanged, setAvatarChanged] = useState<boolean>(false);
+  const [updateImage, { isLoading }] = useUpdateImageMutation();
+  const [deleteImage] = useDeleteImageMutation();
+  const [updateArtistById] = useUpdateArtistByIdMutation();
 
   const {
     register,
@@ -125,22 +135,23 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
     formState: { errors, isDirty },
     reset,
   } = useForm<FormData>({
-    defaultValues: { name, facebook, vk, spotify, soundcloud },
+    defaultValues: { name, facebook, vk, spotify, soundcloud, instagram, twitter },
   });
 
   function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
-      setAvatar(imageUrl);
+      setNewAvatar(imageUrl);
+      setAvatarFile(file);
       setAvatarChanged(true);
     }
     event.target.value = "";
   }
 
-  function onSubmit(data: FormData) {
+  async function onSubmit(data: FormData) {
     if (format === "Add") {
-      console.log("Entered data:", { ...data, avatar });
+      console.log("Entered data:", { ...data, newAvatar });
       reset();
       onRequestClose();
       return;
@@ -153,17 +164,41 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
       return;
     }
 
-    const changes = {
+    if (avatarChanged && avatarFile) {
+      try {
+        await useImage(avatarFile, setNewAvatar, updateImage);
+
+        if (avatar) {
+          const fileName = avatar.split("/").pop();
+
+          if (fileName) {
+            await deleteImage({ storageName: "artistsAvatars", fileName });
+            console.log("ПОЛНОЕ ИМЯ", fileName);
+            console.log("БЕЗ ИЗМЕНЕНИЙ", avatar);
+          }
+        }
+      } catch (error) {
+        console.log("Ошибка загрузки нового аватара:", error);
+        return;
+      }
+    }
+    const newData = {
       ...Object.fromEntries(
         Object.entries(data).filter(([key, value]) => value !== currentArtist?.[key as keyof FormData])
       ),
-      ...(avatarChanged && { avatar }),
+      ...(avatarChanged ? { avatar: newAvatar } : {}),
     };
 
-    if (Object.keys(changes).length) {
-      console.log("Измененные данные:", changes);
+    if (Object.keys(newData).length) {
+      console.log("Измененные данные:", newData);
+      try {
+        await updateArtistById({ id, newData });
+      } catch (error) {
+        console.log("Artist data update error: ", error);
+        toast.error("Artist data update error");
+      }
     }
-
+    toast.success("Artist information updated.");
     reset();
     onRequestClose();
   }
@@ -172,14 +207,14 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
     <FormContainer onSubmit={handleSubmit(onSubmit)}>
       <AvatarContainer>
         <HiddenFileInput id="avatarUpload" type="file" accept="image/*" onChange={handleAvatarChange} />
-        <AvatarWrapper onClick={() => document.getElementById("avatarUpload")?.click()}>
-          <RoundAvatar src={avatar}>
+        <AvatarWrapper>
+          <RoundAvatar onClick={() => document.getElementById("avatarUpload")?.click()} src={newAvatar}>
             <UploadIcon />
           </RoundAvatar>
         </AvatarWrapper>
       </AvatarContainer>
 
-      {["name", "facebook", "vk", "spotify", "soundcloud"].map((field) => (
+      {["name", "facebook", "vk", "spotify", "soundcloud", "instagram", "twitter"].map((field) => (
         <div key={field}>
           <Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Label>
           <InputField
@@ -191,11 +226,11 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
       ))}
 
       <ButtonContainer>
-        <Button $variations="secondary" $size="medium" type="button" onClick={onRequestClose}>
+        <Button $variations="secondary" $size="medium" type="button" disabled={isLoading} onClick={onRequestClose}>
           Cancel
         </Button>
         <Button $variations="primary" $size="medium" type="submit">
-          Save
+          {isLoading ? "Saving..." : "Save"}
         </Button>
       </ButtonContainer>
     </FormContainer>
