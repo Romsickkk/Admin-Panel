@@ -7,25 +7,19 @@ interface ArtistData {
 
 export const apiArtist = createApi({
   reducerPath: "apiArtist",
-  baseQuery: fetchBaseQuery({ baseUrl: "/" }), // Указываем заглушку для baseQuery
+  baseQuery: fetchBaseQuery({ baseUrl: "/" }),
   endpoints: (builder) => ({
     updateArtistById: builder.mutation<any, { id: number; newData: ArtistData }>({
       async queryFn({ id, newData }) {
         try {
-          // Запрос к Supabase для обновления данных
-          const { data, error } = await supabase
-            .from("artists") // имя таблицы
-            .update(newData) // передаем новые данные
-            .eq("id", id); // фильтруем по id
+          const { data, error } = await supabase.from("artists").update(newData).eq("id", id);
 
           if (error) {
-            // Используем стандартный формат ошибки, как требует RTK Query
             return { error: { status: 500, data: error.message } };
           }
 
-          return { data }; // Возвращаем обновленные данные
+          return { data };
         } catch (error) {
-          // Обрабатываем исключение, если оно произошло
           return {
             error: { status: 500, data: error instanceof Error ? error.message : "Unknown error" },
           };

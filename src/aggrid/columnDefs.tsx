@@ -8,7 +8,6 @@ import AgEditButton from "../ui/AgEditButton";
 import AgLink from "../ui/AgLink";
 import styled from "styled-components";
 
-// Исправление стилей для EditingButtonsDiv
 const EditingButtonsDiv = styled.div`
   display: flex;
   gap: 3px;
@@ -55,7 +54,7 @@ export const columnDefs: ColDef<ArtistData>[] = [
           src={params.value}
           alt="Artist Avatar"
           style={{
-            width: "40px", // Исправлено с "40x" на "40px"
+            width: "40px",
             height: "40px",
             objectFit: "cover",
             borderRadius: "50%",

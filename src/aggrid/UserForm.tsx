@@ -1,14 +1,17 @@
 import { useState } from "react";
+import { updateNewImage } from "./updateNewImage";
 import { useForm } from "react-hook-form";
+import { LuImagePlus } from "react-icons/lu";
+import { useUpdateArtistByIdMutation } from "../services/apiArtist";
+import { useDeleteImageMutation, useUpdateImageMutation } from "../services/apiArtistAvatar";
+
 import { type ArtistData } from "../artists/apiArtists";
+
 import Button from "../ui/Button";
 import styled from "styled-components";
-import { LuImagePlus } from "react-icons/lu";
-import DefaultAvatar from "../assets/default-avatar.png";
-import { useDeleteImageMutation, useUpdateImageMutation } from "../services/apiArtistAvatar";
-import { useImage } from "./useImage";
 import toast from "react-hot-toast";
-import { useUpdateArtistByIdMutation } from "../services/apiArtist";
+import DefaultAvatar from "../assets/default-avatar.png";
+import { imageFilter } from "../hooks/imageFilter";
 
 const FormContainer = styled.form`
   display: flex;
@@ -116,12 +119,12 @@ interface FormData {
 
 interface UserFormProps {
   format: string | null;
-  currentArtist: ArtistData;
+  currentArtist: ArtistData | null;
   onRequestClose: () => void;
 }
 
 function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
-  const { id, avatar, name, facebook, vk, spotify, soundcloud, instagram, twitter } = currentArtist ?? {};
+  const { avatar, name, facebook, vk, spotify, soundcloud, instagram, twitter } = currentArtist ?? {};
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [newAvatar, setNewAvatar] = useState<string>(avatar || DefaultAvatar);
   const [avatarChanged, setAvatarChanged] = useState<boolean>(false);
@@ -139,14 +142,15 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
   });
 
   function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (file) {
+    const files = event.target.files;
+    if (files && imageFilter(files)) {
+      const file = files[0];
       const imageUrl = URL.createObjectURL(file);
       setNewAvatar(imageUrl);
       setAvatarFile(file);
       setAvatarChanged(true);
+      event.target.value = "";
     }
-    event.target.value = "";
   }
 
   async function onSubmit(data: FormData) {
@@ -157,50 +161,55 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
       return;
     }
 
-    if (!isDirty && !avatarChanged) {
-      console.log("Нет изменений");
-      reset();
-      onRequestClose();
-      return;
-    }
-
-    if (avatarChanged && avatarFile) {
-      try {
-        await useImage(avatarFile, setNewAvatar, updateImage);
-
-        if (avatar) {
-          const fileName = avatar.split("/").pop();
-
-          if (fileName) {
-            await deleteImage({ storageName: "artistsAvatars", fileName });
-            console.log("ПОЛНОЕ ИМЯ", fileName);
-            console.log("БЕЗ ИЗМЕНЕНИЙ", avatar);
-          }
-        }
-      } catch (error) {
-        console.log("Ошибка загрузки нового аватара:", error);
+    if (currentArtist && format === "Edit") {
+      if (!isDirty && !avatarChanged) {
+        console.log("Нет изменений");
+        reset();
+        onRequestClose();
         return;
       }
-    }
-    const newData = {
-      ...Object.fromEntries(
-        Object.entries(data).filter(([key, value]) => value !== currentArtist?.[key as keyof FormData])
-      ),
-      ...(avatarChanged ? { avatar: newAvatar } : {}),
-    };
 
-    if (Object.keys(newData).length) {
-      console.log("Измененные данные:", newData);
-      try {
-        await updateArtistById({ id, newData });
-      } catch (error) {
-        console.log("Artist data update error: ", error);
-        toast.error("Artist data update error");
+      if (avatarChanged && avatarFile) {
+        try {
+          await updateNewImage(avatarFile, setNewAvatar, updateImage);
+
+          if (avatar) {
+            const fileName = avatar.split("/").pop();
+
+            if (fileName) {
+              await deleteImage({ storageName: "artistsAvatars", fileName });
+              console.log("ПОЛНОЕ ИМЯ", fileName);
+              console.log("БЕЗ ИЗМЕНЕНИЙ", avatar);
+            }
+          }
+        } catch (error) {
+          console.log("Ошибка загрузки нового аватара:", error);
+          return;
+        }
       }
+      const newData = {
+        id: currentArtist.id,
+        name: currentArtist.name,
+        ...Object.fromEntries(
+          Object.entries(data).filter(([key, value]) => value !== currentArtist?.[key as keyof FormData])
+        ),
+        ...(avatarChanged ? { avatar: newAvatar } : {}),
+      };
+
+      if (Object.keys(newData).length) {
+        console.log("Datas changed:", newData);
+
+        try {
+          await updateArtistById({ id: newData.id, newData });
+        } catch (error) {
+          console.log("Artist data update error: ", error);
+          toast.error("Artist data update error");
+        }
+      }
+      toast.success("Artist information updated.");
+      reset();
+      onRequestClose();
     }
-    toast.success("Artist information updated.");
-    reset();
-    onRequestClose();
   }
 
   return (

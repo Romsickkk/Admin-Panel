@@ -93,7 +93,7 @@ function AgFormModal({ modalName, onRequestClose, currentArtist }: ModalInterfac
         <>
           <p>Add Artist</p>
 
-          <UserForm format={modalName} onRequestClose={onRequestClose} />
+          <UserForm format={modalName} currentArtist={null} onRequestClose={onRequestClose} />
         </>
       )}
     </ReactModal>

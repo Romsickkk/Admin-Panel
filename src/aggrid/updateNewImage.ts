@@ -1,9 +1,9 @@
 import toast from "react-hot-toast";
 import supabase from "../services/supabase";
 
-export async function useImage(file: File, setNewAvatar: (url: string) => void, updateImage: any) {
+export async function updateNewImage(file: File, setNewAvatar: (url: string) => void, updateImage: any) {
   const fileName = `${crypto.randomUUID()}_${file.name}`;
-  const { data, error } = await supabase.storage.from("artistsAvatars").upload(fileName, file);
+  const { error } = await supabase.storage.from("artistsAvatars").upload(fileName, file);
 
   if (error) {
     toast.error(`Image upload error:  ${error.message}`);
