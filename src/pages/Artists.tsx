@@ -1,10 +1,10 @@
-import GridColumns from "../artists/AgGridColumns";
+import ArtistsAgGrid from "../features/artists/ArtistsAgGrid";
 
 function Artists() {
   return (
     <>
       <div>Artists</div>
-      <GridColumns />
+      <ArtistsAgGrid />
     </>
   );
 }

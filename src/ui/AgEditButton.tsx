@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { ArtistData } from "../artists/apiArtists";
+import { ArtistData } from "../features/artists/apiArtists";
 import { ICellRendererParams } from "ag-grid-community";
 
 import styled from "styled-components";
@@ -50,21 +50,15 @@ interface AGButtonProps {
   icon?: ReactNode;
   params: ICellRendererParams;
   modalChange: (name: string) => void;
-  changeCurrentArtist: (artist: ArtistData) => void;
+  changeCurrentData: (artist: ArtistData) => void;
 }
 
-function AgEditButton({
-  name,
-  icon,
-  params,
-  modalChange,
-  changeCurrentArtist,
-}: AGButtonProps) {
+function AgEditButton({ name, icon, params, modalChange, changeCurrentData }: AGButtonProps) {
   return (
     <AgDiv
       onClick={() => {
         modalChange(name);
-        changeCurrentArtist(params.data);
+        changeCurrentData(params.data);
       }}
     >
       {icon}

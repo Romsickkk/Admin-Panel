@@ -1,17 +1,17 @@
 import { useState } from "react";
-import { updateNewImage } from "./updateNewImage";
+
 import { useForm } from "react-hook-form";
 import { LuImagePlus } from "react-icons/lu";
-import { useUpdateArtistByIdMutation } from "../services/apiArtist";
-import { useDeleteImageMutation, useUpdateImageMutation } from "../services/apiArtistAvatar";
+// import { useUpdateReleasesByNameMutation } from "./apiReleases";
+// import { useDeleteImageMutation, useUpdateImageMutation } from "../../services/apiReleasesAvatar";
 
-import { type ArtistData } from "../artists/apiArtists";
+import { useUpdateReleasesByNameMutation, type ReleasesData } from "./apiReleases";
 
-import Button from "../ui/Button";
+import Button from "../../ui/Button";
 import styled from "styled-components";
 import toast from "react-hot-toast";
-import DefaultAvatar from "../assets/default-avatar.png";
-import { imageFilter } from "../hooks/imageFilter";
+import DefaultAvatar from "../../assets/default-avatar.png";
+import { imageFilter } from "../../hooks/imageFilter";
 
 const FormContainer = styled.form`
   display: flex;
@@ -109,28 +109,22 @@ const ButtonContainer = styled.div`
 
 interface FormData {
   name: string;
-  facebook: string;
-  vk: string;
-  spotify: string;
-  soundcloud: string;
-  instagram: string;
-  twitter: string;
+  owners: string;
+  cygnus: string;
 }
 
 interface UserFormProps {
   format: string | null;
-  currentArtist: ArtistData | null;
+  currentReleases: ReleasesData | null;
   onRequestClose: () => void;
 }
 
-function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
-  const { avatar, name, facebook, vk, spotify, soundcloud, instagram, twitter } = currentArtist ?? {};
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+function ReleasesForm({ format, currentReleases, onRequestClose }: UserFormProps) {
+  const { avatar, name, owners, cygnus } = currentReleases ?? {};
+  // const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [newAvatar, setNewAvatar] = useState<string>(avatar || DefaultAvatar);
   const [avatarChanged, setAvatarChanged] = useState<boolean>(false);
-  const [updateImage, { isLoading }] = useUpdateImageMutation();
-  const [deleteImage] = useDeleteImageMutation();
-  const [updateArtistById] = useUpdateArtistByIdMutation();
+  const [updateReleasesByName, { isLoading }] = useUpdateReleasesByNameMutation();
 
   const {
     register,
@@ -138,7 +132,7 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
     formState: { errors, isDirty },
     reset,
   } = useForm<FormData>({
-    defaultValues: { name, facebook, vk, spotify, soundcloud, instagram, twitter },
+    defaultValues: { name, owners, cygnus },
   });
 
   function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -147,7 +141,7 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
       const file = files[0];
       const imageUrl = URL.createObjectURL(file);
       setNewAvatar(imageUrl);
-      setAvatarFile(file);
+      // setAvatarFile(file);
       setAvatarChanged(true);
       event.target.value = "";
     }
@@ -161,7 +155,7 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
       return;
     }
 
-    if (currentArtist && format === "Edit") {
+    if (currentReleases && format === "Edit") {
       if (!isDirty && !avatarChanged) {
         console.log("Нет изменений");
         reset();
@@ -169,29 +163,10 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
         return;
       }
 
-      if (avatarChanged && avatarFile) {
-        try {
-          await updateNewImage(avatarFile, setNewAvatar, updateImage);
-
-          if (avatar) {
-            const fileName = avatar.split("/").pop();
-
-            if (fileName) {
-              await deleteImage({ storageName: "artistsAvatars", fileName });
-              console.log("ПОЛНОЕ ИМЯ", fileName);
-              console.log("БЕЗ ИЗМЕНЕНИЙ", avatar);
-            }
-          }
-        } catch (error) {
-          console.log("Ошибка загрузки нового аватара:", error);
-          return;
-        }
-      }
       const newData = {
-        id: currentArtist.id,
-        name: currentArtist.name,
+        ...currentReleases,
         ...Object.fromEntries(
-          Object.entries(data).filter(([key, value]) => value !== currentArtist?.[key as keyof FormData])
+          Object.entries(data).filter(([key, value]) => value !== currentReleases?.[key as keyof FormData])
         ),
         ...(avatarChanged ? { avatar: newAvatar } : {}),
       };
@@ -200,13 +175,13 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
         console.log("Datas changed:", newData);
 
         try {
-          await updateArtistById({ id: newData.id, newData });
+          await updateReleasesByName({ name: newData.name, newData });
         } catch (error) {
-          console.log("Artist data update error: ", error);
-          toast.error("Artist data update error");
+          console.log("Releases data update error: ", error);
+          toast.error("Releases data update error");
         }
       }
-      toast.success("Artist information updated.");
+      toast.success("Releases information updated.");
       reset();
       onRequestClose();
     }
@@ -223,7 +198,7 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
         </AvatarWrapper>
       </AvatarContainer>
 
-      {["name", "facebook", "vk", "spotify", "soundcloud", "instagram", "twitter"].map((field) => (
+      {["name", "owner (s)", "vk", "cygnus"].map((field) => (
         <div key={field}>
           <Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Label>
           <InputField
@@ -246,4 +221,4 @@ function UserForm({ format, currentArtist, onRequestClose }: UserFormProps) {
   );
 }
 
-export default UserForm;
+export default ReleasesForm;

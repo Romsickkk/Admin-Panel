@@ -1,8 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-import supabase from "../services/supabase";
+import supabase from "../../services/supabase";
 
 export type ArtistData = {
+  id: number;
   name: string;
   avatar: string | undefined;
   facebook: string | undefined;
@@ -11,11 +12,10 @@ export type ArtistData = {
   soundcloud: string | undefined;
   instagram: string | undefined;
   twitter: string | undefined;
-  id: number;
 };
 
-export const supabaseApi = createApi({
-  reducerPath: "supabaseApi",
+export const apiArtists = createApi({
+  reducerPath: "apiArtists",
   baseQuery: fetchBaseQuery({ baseUrl: "" }),
   endpoints: (builder) => ({
     getTableData: builder.query<ArtistData[], void>({
@@ -46,15 +46,23 @@ export const supabaseApi = createApi({
         return { data: formattedData };
       },
     }),
-    updateArtist: builder.mutation({
-      query: ({ id, updateValues }) => ({
-        url: "artists",
-        method: "PATCH",
-        body: updateValues,
-        params: {
-          id: `eq.${id}`,
-        },
-      }),
+    updateArtistById: builder.mutation<any, { id: number; newData: ArtistData }>({
+      async queryFn({ id, newData }) {
+        try {
+          const { data, error } = await supabase.from("artists").update(newData).eq("id", id);
+
+          if (error) {
+            return { error: { status: 500, data: error.message } };
+          }
+          console.log(data);
+
+          return { data };
+        } catch (error) {
+          return {
+            error: { status: 500, data: error instanceof Error ? error.message : "Unknown error" },
+          };
+        }
+      },
     }),
     // Мутация для удаления данных
     // deleteArtist: builder.mutation({
@@ -69,4 +77,4 @@ export const supabaseApi = createApi({
   }),
 });
 
-export const { useGetTableDataQuery } = supabaseApi;
+export const { useGetTableDataQuery, useUpdateArtistByIdMutation } = apiArtists;

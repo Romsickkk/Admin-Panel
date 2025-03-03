@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useColumnDefs } from "./useColumnDefs";
+import { useReleasessColumnDefs } from "./useReleasesColumnDefs";
 import { AgGridReact } from "ag-grid-react";
-import { type ArtistData, useGetTableDataQuery } from "./apiArtists";
+import { type ReleasesData, useGetTableDataQuery } from "./apiReleases";
 import {
   CellStyleModule,
   ClientSideRowModelModule,
@@ -10,18 +10,18 @@ import {
   ValidationModule,
 } from "ag-grid-community";
 
-import Spinner from "../ui/Spiner";
-import AgFormModal from "./AgFormModal";
-import AgGridWrapper from "../ui/AgGridWrapper";
-import AddArtistButton from "../ui/AddArtistButton";
+import Spinner from "../../ui/Spinner";
+import ReleasessFormModal from "./ReleasesFormModal";
+import AgGridWrapper from "../../ui/AgGridWrapper";
+import AddButton from "../../ui/AddButton";
 
 export type ModalType = "Edit" | "Delete" | "Add" | null;
 
-function AgGridComponent() {
+function ReleasesAgGrid() {
   const { data, error, isLoading, refetch } = useGetTableDataQuery();
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
-  const [currentArtist, setCurrentArtist] = useState<ArtistData | null>(null);
-  const columnDefs = useColumnDefs();
+  const [currentReleases, setCurrentReleases] = useState<ReleasesData | null>(null);
+  const releasesColumnDefs = useReleasessColumnDefs();
 
   function openModal(modalName: ModalType) {
     setCurrentModal(modalName);
@@ -29,10 +29,11 @@ function AgGridComponent() {
 
   function closeModal() {
     setCurrentModal(null);
-    setCurrentArtist(null);
+    setCurrentReleases(null);
   }
 
   if (isLoading) return <Spinner />;
+  console.log(data);
 
   if (error) {
     const errorMessage = (error as { message: string }).message || "An unknown error occurred";
@@ -42,12 +43,12 @@ function AgGridComponent() {
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
-        <AddArtistButton changeModal={openModal} />
+        <AddButton changeModal={openModal} name="Release" />
       </div>
 
       <AgGridWrapper className="ag-theme-alpine-dark">
         <AgGridReact
-          columnDefs={columnDefs}
+          columnDefs={releasesColumnDefs}
           defaultColDef={{
             filter: true,
             floatingFilter: true,
@@ -58,13 +59,13 @@ function AgGridComponent() {
           paginationPageSizeSelector={false}
           context={{
             openModal,
-            changeCurrentArtist: (artist: ArtistData) => setCurrentArtist(artist),
+            changeCurrentReleases: (releases: ReleasesData) => setCurrentReleases(releases),
           }}
           modules={[PaginationModule, CellStyleModule, ClientSideRowModelModule, ValidationModule, TextFilterModule]}
         />
       </AgGridWrapper>
 
-      <AgFormModal modalName={currentModal} onRequestClose={closeModal} currentArtist={currentArtist} />
+      <ReleasessFormModal modalName={currentModal} onRequestClose={closeModal} currentReleases={currentReleases} />
       <button onClick={() => refetch()} style={{ padding: "0.5rem 1rem", borderRadius: "8px" }}>
         Refetch
       </button>
@@ -72,4 +73,4 @@ function AgGridComponent() {
   );
 }
 
-export default AgGridComponent;
+export default ReleasesAgGrid;

@@ -28,7 +28,20 @@ export const authApi = createApi({
       },
       invalidatesTags: [{ type: "Auth", id: "USER" }],
     }),
+    currentUser: builder.query({
+      queryFn: async () => {
+        const { data: session } = await supabase.auth.getSession();
+        if (!session.session) return { error: { status: 401, data: "Unauthorized" } };
+
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) throw new Error(error.message);
+
+        return { data: data.user };
+      },
+      providesTags: [{ type: "Auth", id: "USER" }],
+    }),
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation, useCurrentUserQuery } = authApi;

@@ -1,11 +1,11 @@
 import { type ArtistData } from "./apiArtists";
 
 import ReactModal from "react-modal";
-import UserForm from "../aggrid/UserForm";
-import Button from "../ui/Button";
+import ArtistsForm from "./ArtistsForm";
+import Button from "../../ui/Button";
 import styled from "styled-components";
 
-import { type ModalType } from "./AgGridColumns";
+import { type ModalType } from "./ArtistsAgGrid";
 
 interface ModalInterface {
   modalName: ModalType;
@@ -53,15 +53,7 @@ const WarningText = styled.p`
   justify-content: center;
 `;
 
-// const Avatar = styled.img`
-//   gap: 2px;
-//   width: 40px;
-//   height: 40px;
-//   border-radius: 50%;
-//   margin-left: 10px;
-// `;
-
-function AgFormModal({ modalName, onRequestClose, currentArtist }: ModalInterface) {
+function ArtistsFormModal({ modalName, onRequestClose, currentArtist }: ModalInterface) {
   const isOpen = !!modalName;
 
   return (
@@ -70,7 +62,7 @@ function AgFormModal({ modalName, onRequestClose, currentArtist }: ModalInterfac
         <>
           <p>Edit Artist</p>
           {currentArtist && (
-            <UserForm format={modalName} currentArtist={currentArtist} onRequestClose={onRequestClose} />
+            <ArtistsForm format={modalName} currentArtist={currentArtist} onRequestClose={onRequestClose} />
           )}
         </>
       ) : modalName === "Delete" ? (
@@ -93,10 +85,10 @@ function AgFormModal({ modalName, onRequestClose, currentArtist }: ModalInterfac
         <>
           <p>Add Artist</p>
 
-          <UserForm format={modalName} currentArtist={null} onRequestClose={onRequestClose} />
+          <ArtistsForm format={modalName} currentArtist={null} onRequestClose={onRequestClose} />
         </>
       )}
     </ReactModal>
   );
 }
-export default AgFormModal;
+export default ArtistsFormModal;

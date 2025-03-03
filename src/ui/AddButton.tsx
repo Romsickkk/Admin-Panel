@@ -1,21 +1,22 @@
 import { FaUserPlus } from "react-icons/fa";
 
-import { type ModalType } from "../artists/AgGridColumns";
+import { type ModalType } from "../features/artists/ArtistsAgGrid";
 
 import Button from "./Button";
 
 interface AddArtistButtonProps {
   changeModal: (modalName: ModalType) => void;
+  name: string;
 }
-function AddArtistButton({ changeModal }: AddArtistButtonProps) {
+function AddButton({ changeModal, name }: AddArtistButtonProps) {
   function handleSubmit() {
     changeModal("Add");
   }
   return (
     <Button $size="medium" $variations="secondary" onClick={handleSubmit}>
-      <FaUserPlus /> Add Artist
+      <FaUserPlus /> Add {name}
     </Button>
   );
 }
 
-export default AddArtistButton;
+export default AddButton;
