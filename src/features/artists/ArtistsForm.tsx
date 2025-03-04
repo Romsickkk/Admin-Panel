@@ -178,8 +178,6 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
 
             if (fileName) {
               await deleteImage({ storageName: "artistsAvatars", fileName });
-              console.log("ПОЛНОЕ ИМЯ", fileName);
-              console.log("БЕЗ ИЗМЕНЕНИЙ", avatar);
             }
           }
         } catch (error) {
@@ -196,8 +194,6 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
       };
 
       if (Object.keys(newData).length) {
-        console.log("Datas changed:", newData);
-
         try {
           await updateArtistById({ id: newData.id, newData });
         } catch (error) {
@@ -226,7 +222,16 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
         <div key={field}>
           <Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Label>
           <InputField
-            {...register(field as keyof FormData, { required: `${field} is compulsory` })}
+            {...register(field as keyof FormData, {
+              required: field === "name" ? `${field} is compulsory` : false,
+              pattern:
+                field !== "name"
+                  ? {
+                      value: /^(https?:\/\/)?([\w\d]+\.)?[\w\d]+\.\w{2,}(\/.*)?$/,
+                      message: `Invalid ${field} URL`,
+                    }
+                  : undefined,
+            })}
             placeholder={`Enter ${field}`}
           />
           {errors[field as keyof FormData] && <ErrorMessage>{errors[field as keyof FormData]?.message}</ErrorMessage>}

@@ -54,7 +54,6 @@ export const apiArtists = createApi({
           if (error) {
             return { error: { status: 500, data: error.message } };
           }
-          console.log(data);
 
           return { data };
         } catch (error) {

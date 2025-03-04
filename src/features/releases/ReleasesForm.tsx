@@ -1,17 +1,23 @@
 import { useState } from "react";
 
-import { useForm } from "react-hook-form";
 import { LuImagePlus } from "react-icons/lu";
+import { imageFilter } from "../../hooks/imageFilter";
+
+import { Controller, useForm } from "react-hook-form";
 // import { useUpdateReleasesByNameMutation } from "./apiReleases";
 // import { useDeleteImageMutation, useUpdateImageMutation } from "../../services/apiReleasesAvatar";
 
 import { useUpdateReleasesByNameMutation, type ReleasesData } from "./apiReleases";
 
-import Button from "../../ui/Button";
-import styled from "styled-components";
 import toast from "react-hot-toast";
+import Button from "../../ui/Button";
+import Select from "react-select";
+
+import styled from "styled-components";
+import makeAnimated from "react-select/animated";
+import useSelectData from "../../ui/useSelectData";
 import DefaultAvatar from "../../assets/default-avatar.png";
-import { imageFilter } from "../../hooks/imageFilter";
+import { selectStyles } from "../../ui/selectStyles";
 
 const FormContainer = styled.form`
   display: flex;
@@ -125,8 +131,14 @@ function ReleasesForm({ format, currentReleases, onRequestClose }: UserFormProps
   const [newAvatar, setNewAvatar] = useState<string>(avatar || DefaultAvatar);
   const [avatarChanged, setAvatarChanged] = useState<boolean>(false);
   const [updateReleasesByName, { isLoading }] = useUpdateReleasesByNameMutation();
+  const animatedComponents = makeAnimated();
+  const { artistsNames, isLoading: isSelectLoading } = useSelectData();
+
+  console.log(artistsNames);
 
   const {
+    control,
+
     register,
     handleSubmit,
     formState: { errors, isDirty },
@@ -197,12 +209,45 @@ function ReleasesForm({ format, currentReleases, onRequestClose }: UserFormProps
           </RoundAvatar>
         </AvatarWrapper>
       </AvatarContainer>
+      <div>
+        <Label>Owner(s)</Label>
+        <Controller
+          name="owners"
+          control={control}
+          render={({ field }) => (
+            <Select
+              {...field}
+              closeMenuOnSelect={false}
+              components={animatedComponents}
+              options={artistsNames}
+              styles={selectStyles}
+              isLoading={isSelectLoading}
+              isSearchable={true}
+              isMulti
+              onMenuOpen={() => console.log("Menu opened")}
+              onInputChange={(newValue) => console.log(newValue)}
+            />
+          )}
+        />
 
-      {["name", "owner (s)", "vk", "cygnus"].map((field) => (
+        {/* Добавляем отображение ошибок */}
+        {errors.owners && <ErrorMessage>{errors.owners.message}</ErrorMessage>}
+      </div>
+
+      {["name", "cygnus"].map((field) => (
         <div key={field}>
           <Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Label>
           <InputField
-            {...register(field as keyof FormData, { required: `${field} is compulsory` })}
+            {...register(field as keyof FormData, {
+              required: field === "name" ? `${field} is compulsory` : false,
+              pattern:
+                field !== "name"
+                  ? {
+                      value: /^(https?:\/\/)?([\w\d]+\.)?[\w\d]+\.\w{2,}(\/.*)?$/,
+                      message: `Invalid ${field} URL`,
+                    }
+                  : undefined,
+            })}
             placeholder={`Enter ${field}`}
           />
           {errors[field as keyof FormData] && <ErrorMessage>{errors[field as keyof FormData]?.message}</ErrorMessage>}

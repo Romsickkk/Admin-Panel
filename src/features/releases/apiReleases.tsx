@@ -25,7 +25,6 @@ export const apiReleases = createApi({
             },
           };
         }
-        console.log("data in fetch", data);
 
         return { data };
       },
@@ -38,7 +37,6 @@ export const apiReleases = createApi({
           if (error) {
             return { error: { status: 500, data: error.message } };
           }
-          console.log(data);
 
           return { data };
         } catch (error) {

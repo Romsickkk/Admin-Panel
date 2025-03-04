@@ -33,7 +33,6 @@ function ReleasesAgGrid() {
   }
 
   if (isLoading) return <Spinner />;
-  console.log(data);
 
   if (error) {
     const errorMessage = (error as { message: string }).message || "An unknown error occurred";
