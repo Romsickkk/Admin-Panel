@@ -5,7 +5,7 @@ import supabase from "../../services/supabase";
 export type ReleasesData = {
   avatar: string | null;
   name: string;
-  owners: string;
+  owners: string[];
   cygnus: string;
 };
 

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useReleasessColumnDefs } from "./useReleasesColumnDefs";
+import useReleasessColumnDefs from "./useReleasesColumnDefs";
 import { AgGridReact } from "ag-grid-react";
 import { type ReleasesData, useGetTableDataQuery } from "./apiReleases";
 import {
@@ -18,7 +18,7 @@ import AddButton from "../../ui/AddButton";
 export type ModalType = "Edit" | "Delete" | "Add" | null;
 
 function ReleasesAgGrid() {
-  const { data, error, isLoading, refetch } = useGetTableDataQuery();
+  const { data, error, isLoading } = useGetTableDataQuery();
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentReleases, setCurrentReleases] = useState<ReleasesData | null>(null);
   const releasesColumnDefs = useReleasessColumnDefs();
@@ -65,9 +65,6 @@ function ReleasesAgGrid() {
       </AgGridWrapper>
 
       <ReleasessFormModal modalName={currentModal} onRequestClose={closeModal} currentReleases={currentReleases} />
-      <button onClick={() => refetch()} style={{ padding: "0.5rem 1rem", borderRadius: "8px" }}>
-        Refetch
-      </button>
     </div>
   );
 }

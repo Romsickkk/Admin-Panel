@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { ArtistData, useGetTableDataQuery } from "../features/artists/apiArtists";
 
 export function useSelectData() {
-  const [artistsNames, setArtistsNames] = useState<{ label: string; value: string }[]>([]);
+  const [ownersNames, setOwnersNames] = useState<{ label: string; value: string }[]>([]);
   const { data: artists, isLoading, error } = useGetTableDataQuery();
+
   useEffect(() => {
     if (!isLoading && !error && artists) {
-      setArtistsNames(
+      setOwnersNames(
         artists.map((artist: ArtistData) => ({
           label: artist.name,
           value: artist.name,
@@ -16,7 +17,7 @@ export function useSelectData() {
     }
   }, [artists, isLoading, error]);
 
-  return { artistsNames, isLoading };
+  return { ownersNames, isLoading };
 }
 
 export default useSelectData;

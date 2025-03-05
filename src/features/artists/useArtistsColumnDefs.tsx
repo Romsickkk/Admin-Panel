@@ -82,7 +82,7 @@ export const useArtistsColumnDefs = () => {
       ...socialNetworks.map(
         (network, index, array) =>
           ({
-            headerName: network.charAt(0).toUpperCase() + network.slice(1),
+            headerName: network.length > 3 ? network.charAt(0).toUpperCase() + network.slice(1) : network.toUpperCase(),
             field: network as keyof ArtistData,
             cellRenderer: (params: ICellRendererParams) => <AgLink value={params.value} />,
             flex: 1,

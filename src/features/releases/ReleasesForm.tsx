@@ -1,121 +1,37 @@
 import { useState } from "react";
 
-import { LuImagePlus } from "react-icons/lu";
 import { imageFilter } from "../../hooks/imageFilter";
 
 import { Controller, useForm } from "react-hook-form";
 // import { useUpdateReleasesByNameMutation } from "./apiReleases";
 // import { useDeleteImageMutation, useUpdateImageMutation } from "../../services/apiReleasesAvatar";
 
-import { useUpdateReleasesByNameMutation, type ReleasesData } from "./apiReleases";
+import { useGetTableDataQuery, useUpdateReleasesByNameMutation, type ReleasesData } from "./apiReleases";
 
 import toast from "react-hot-toast";
 import Button from "../../ui/Button";
 import Select from "react-select";
 
-import styled from "styled-components";
 import makeAnimated from "react-select/animated";
 import useSelectData from "../../ui/useSelectData";
 import DefaultAvatar from "../../assets/default-avatar.png";
 import { selectStyles } from "../../ui/selectStyles";
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 20px;
-  background: #1f2937;
-  border-radius: 8px;
-`;
-
-const AvatarContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const HiddenFileInput = styled.input`
-  display: none;
-`;
-
-const AvatarWrapper = styled.div`
-  position: relative;
-  width: 80px;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &:hover svg {
-    color: #ff6e1b;
-  }
-`;
-
-const UploadIcon = styled(LuImagePlus)`
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.6);
-  border-radius: 50%;
-  padding: 4px;
-  color: white;
-  font-size: 25px;
-`;
-
-const RoundAvatar = styled.div<{ src: string }>`
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: url(${(props) => props.src}) center/cover no-repeat;
-  border: 2px solid #ff6e1b;
-  cursor: pointer;
-
-  &:hover {
-    opacity: 0.8;
-  }
-`;
-
-const InputField = styled.input`
-  padding: 0.8rem;
-  border: 1px solid #4b5563;
-  border-radius: 8px;
-  background: #374151;
-  color: white;
-  font-size: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-
-  &:focus {
-    border-color: #ff6e1b;
-    outline: none;
-  }
-
-  &::placeholder {
-    color: #9ca3af;
-  }
-`;
-
-const Label = styled.label`
-  font-size: 1rem;
-  color: #e5e7eb;
-`;
-
-const ErrorMessage = styled.p`
-  font-size: 0.875rem;
-  color: #ef4444;
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  width: 100%;
-`;
+import {
+  AvatarContainer,
+  AvatarWrapper,
+  ButtonContainer,
+  ErrorMessage,
+  FormContainer,
+  HiddenFileInput,
+  InputField,
+  Label,
+  RoundAvatar,
+  UploadIcon,
+} from "../styles/FormsStyles";
 
 interface FormData {
   name: string;
-  owners: string;
+  owners: string[];
   cygnus: string;
 }
 
@@ -127,18 +43,17 @@ interface UserFormProps {
 
 function ReleasesForm({ format, currentReleases, onRequestClose }: UserFormProps) {
   const { avatar, name, owners, cygnus } = currentReleases ?? {};
+  const { ownersNames, isLoading: isSelectLoading } = useSelectData();
+  const [updateReleasesByName, { isLoading }] = useUpdateReleasesByNameMutation();
+  const { refetch } = useGetTableDataQuery();
+
   // const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [newAvatar, setNewAvatar] = useState<string>(avatar || DefaultAvatar);
   const [avatarChanged, setAvatarChanged] = useState<boolean>(false);
-  const [updateReleasesByName, { isLoading }] = useUpdateReleasesByNameMutation();
   const animatedComponents = makeAnimated();
-  const { artistsNames, isLoading: isSelectLoading } = useSelectData();
-
-  console.log(artistsNames);
 
   const {
     control,
-
     register,
     handleSubmit,
     formState: { errors, isDirty },
@@ -197,6 +112,7 @@ function ReleasesForm({ format, currentReleases, onRequestClose }: UserFormProps
       reset();
       onRequestClose();
     }
+    refetch();
   }
 
   return (
@@ -219,18 +135,21 @@ function ReleasesForm({ format, currentReleases, onRequestClose }: UserFormProps
               {...field}
               closeMenuOnSelect={false}
               components={animatedComponents}
-              options={artistsNames}
+              options={ownersNames}
+              value={ownersNames.filter((obj) => field.value?.includes(obj.value))}
               styles={selectStyles}
               isLoading={isSelectLoading}
               isSearchable={true}
               isMulti
-              onMenuOpen={() => console.log("Menu opened")}
-              onInputChange={(newValue) => console.log(newValue)}
+              onMenuOpen={() => console.log("field", field)}
+              onChange={(selectedValues) => {
+                const selected = selectedValues as { value: string }[];
+                field.onChange(selected.map((obj) => obj.value));
+              }}
             />
           )}
         />
 
-        {/* Добавляем отображение ошибок */}
         {errors.owners && <ErrorMessage>{errors.owners.message}</ErrorMessage>}
       </div>
 
@@ -258,7 +177,7 @@ function ReleasesForm({ format, currentReleases, onRequestClose }: UserFormProps
         <Button $variations="secondary" $size="medium" type="button" disabled={isLoading} onClick={onRequestClose}>
           Cancel
         </Button>
-        <Button $variations="primary" $size="medium" type="submit">
+        <Button $variations="primary" $size="medium" type="submit" disabled={isLoading}>
           {isLoading ? "Saving..." : "Save"}
         </Button>
       </ButtonContainer>

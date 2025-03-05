@@ -1,14 +1,16 @@
-import { authApi } from "../services/apiAuth";
-
+// store.js
 import { configureStore } from "@reduxjs/toolkit";
+import { authApi } from "../services/apiAuth";
 import { apiArtists } from "../features/artists/apiArtists";
 import { apiArtistAvatar } from "../services/apiArtistAvatar";
 import { apiReleases } from "../features/releases/apiReleases";
+import darkModeReducer from "./darkModeSlice";
 
 export const store = configureStore({
   reducer: {
-    [authApi.reducerPath]: authApi.reducer,
+    darkMode: darkModeReducer,
 
+    [authApi.reducerPath]: authApi.reducer,
     [apiArtists.reducerPath]: apiArtists.reducer,
     [apiReleases.reducerPath]: apiReleases.reducer,
     [apiArtistAvatar.reducerPath]: apiArtistAvatar.reducer,

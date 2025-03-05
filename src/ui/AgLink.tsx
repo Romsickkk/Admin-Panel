@@ -13,7 +13,8 @@ function AGLink({ value }: { value: string }) {
   function extractUsername(url: string): string {
     if (!url) return "No data";
 
-    const match = url.match(/instagram\.com\/([^/?]+)/);
+    const match = url.match(/(?:https?:\/\/)?(?:www\.)?[^/]+\/([^/?]+)/);
+
     return match ? match[1] : url;
   }
 

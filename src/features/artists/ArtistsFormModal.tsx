@@ -28,7 +28,7 @@ const modalStyles = {
     transform: "translate(-50%, -50%)",
     width: "400px",
     padding: "20px",
-    background: "#1F2937",
+    background: "var(--color-grey-200)",
     zIndex: 1010,
     borderRadius: "8px",
     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",

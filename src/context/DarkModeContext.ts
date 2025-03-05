@@ -1,58 +1,29 @@
-// import {
-//   createContext,
-//   ReactNode,
-//   useContext,
-//   useEffect,
-//   useCallback,
-// } from "react";
-// import { useLocalStorageState } from "../hooks/useLocalStorage";
+// import { Provider, useSelector, useDispatch } from "react-redux";
+// import { toggleDarkMode } from "../store/store";
+// import { useEffect } from "react";
 
-// type DarkModeContextType = {
-//   isDarkMode: boolean;
-//   toggleDarkMode: () => void;
-// };
-
-// // Указываем null как значение по умолчанию
-// const DarkModeContext = createContext<DarkModeContextType | null>(null);
-
-// type DarkModeProviderProps = {
-//   children: ReactNode;
-// };
-
-// function DarkModeProvider({ children }: DarkModeProviderProps) {
-//   const [isDarkMode, setIsDarkMode] = useLocalStorageState<boolean>(
-//     window.matchMedia("(prefers-color-scheme: dark)").matches,
-//     "isDarkMode"
-//   );
-
-//   const toggleDarkMode = useCallback(() => {
-//     setIsDarkMode((prev: boolean) => !prev);
-//   }, [setIsDarkMode]);
+// export function DarkModeProvider({ children }) {
+//   const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
+//   const dispatch = useDispatch();
 
 //   useEffect(() => {
-//     const htmlElement = document.documentElement;
 //     if (isDarkMode) {
-//       htmlElement.classList.add("dark-mode");
-//       htmlElement.classList.remove("light-mode");
+//       document.documentElement.classList.add("dark-mode");
+//       document.documentElement.classList.remove("light-mode");
 //     } else {
-//       htmlElement.classList.remove("dark-mode");
-//       htmlElement.classList.add("light-mode");
+//       document.documentElement.classList.remove("dark-mode");
+//       document.documentElement.classList.add("light-mode");
 //     }
 //   }, [isDarkMode]);
 
-//   return (
-//     <DarkModeContext.Provider value={{ isDarkMode, toggleDarkMode }}>
-//       {children}
-//     </DarkModeContext.Provider>
-//   );
+//   return <>{children}</>;
 // }
 
-// function useDarkMode() {
-//   const context = useContext(DarkModeContext);
-//   if (context === null) {
-//     throw new Error("useDarkMode must be used within a DarkModeProvider");
-//   }
-//   return context;
-// }
+// export function useDarkMode() {
+//   const isDarkMode = useSelector((state) => state.darkMode.isDarkMode);
+//   const dispatch = useDispatch();
 
-// export { DarkModeProvider, useDarkMode };
+//   const toggle = () => dispatch(toggleDarkMode());
+
+//   return { isDarkMode, toggle };
+// }

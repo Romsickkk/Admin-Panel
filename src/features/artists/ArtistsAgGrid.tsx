@@ -18,7 +18,7 @@ import AddButton from "../../ui/AddButton";
 export type ModalType = "Edit" | "Delete" | "Add" | null;
 
 function ArtistsAgGrid() {
-  const { data, error, isLoading, refetch } = useGetTableDataQuery();
+  const { data, error, isLoading } = useGetTableDataQuery();
   const [currentModal, setCurrentModal] = useState<ModalType | null>(null);
   const [currentArtist, setCurrentArtist] = useState<ArtistData | null>(null);
   const aritstsColumnDefs = useArtistsColumnDefs();
@@ -65,9 +65,6 @@ function ArtistsAgGrid() {
       </AgGridWrapper>
 
       <ArtistsFormModal modalName={currentModal} onRequestClose={closeModal} currentArtist={currentArtist} />
-      <button onClick={() => refetch()} style={{ padding: "0.5rem 1rem", borderRadius: "8px" }}>
-        Refetch
-      </button>
     </div>
   );
 }

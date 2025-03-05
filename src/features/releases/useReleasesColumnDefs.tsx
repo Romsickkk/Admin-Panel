@@ -26,9 +26,9 @@ const getFilterParams = {
   maxNumConditions: 1,
   suppressAndOrCondition: true,
 };
-const socialNetworks: (keyof ReleasesData)[] = ["owners", "cygnus"];
+const socialNetworks: (keyof ReleasesData)[] = ["cygnus"];
 
-export const useReleasessColumnDefs = () => {
+const useReleasessColumnDefs = () => {
   return useMemo<ColDef<ReleasesData>[]>(
     () => [
       {
@@ -79,6 +79,28 @@ export const useReleasessColumnDefs = () => {
         filter: "agTextColumnFilter",
         filterParams: getFilterParams,
       },
+      {
+        headerName: "Owners",
+        field: "owners" as keyof ReleasesData,
+        flex: 1,
+        minWidth: 80,
+        floatingFilter: false,
+        filter: "agTextColumnFilter",
+        filterParams: getFilterParams,
+        cellRenderer: (params: ICellRendererParams) =>
+          Array.isArray(params.value) ? params.value.join(" & ") : params.value,
+        valueFormatter: (params) => {
+          if (Array.isArray(params.value)) {
+            return params.value.join(" & ");
+          }
+
+          if (typeof params.value === "object") {
+            return JSON.stringify(params.value);
+          }
+          return params.value;
+        },
+      },
+
       ...socialNetworks.map(
         (network, index, array) =>
           ({
@@ -97,3 +119,4 @@ export const useReleasessColumnDefs = () => {
     []
   );
 };
+export default useReleasessColumnDefs;
