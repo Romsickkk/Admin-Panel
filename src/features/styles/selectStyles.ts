@@ -2,51 +2,50 @@ import { StylesConfig } from "react-select";
 export const selectStyles: StylesConfig = {
   input: (base) => ({
     ...base,
-    color: "#e5e7eb", // Цвет вводимого текста
-    caretColor: "#fff", // Цвет каретки (мигающей полоски)
+    color: "var(--color-grey-800)",
+    caretColor: "#fff",
   }),
+
   menuPortal: (base) => ({
     ...base,
     zIndex: 111111,
   }),
+
   control: (base) => ({
     ...base,
     minHeight: 40,
     borderColor: "#4b5563",
-    backgroundColor: "#374151",
+    backgroundColor: "var(--color-grey-100)",
   }),
+
   option: (base, { isFocused, isSelected }) => ({
     ...base,
-    backgroundColor: isSelected
-      ? "#3b82f6" // Цвет выбранного элемента
-      : isFocused
-      ? "#1f2937" // Цвет при наведении
-      : "#374151", // Базовый цвет списка
-    color: "#e5e7eb", // Цвет текста
+    backgroundColor: isSelected ? "#FF6E1B" : isFocused ? "var(--color-grey-300)" : "var(--color-grey-200)",
+    color: "var(--color-grey-600)",
     "&:hover": {
-      backgroundColor: "#1f2937",
-      color: "#f3f4f6",
+      backgroundColor: "var(--color-grey-400)",
+      color: "var(--color-grey-800)",
     },
   }),
   menu: (base) => ({
     ...base,
-    backgroundColor: "#374151",
-    zIndex: 9999, // Чтобы меню не перекрывалось
+    backgroundColor: "var(--color-grey-200)",
+    zIndex: 9999,
   }),
 
   multiValue: (base) => ({
     ...base,
-    backgroundColor: "#9EA0A3", // Темный фон выбранного значения
+    backgroundColor: "#9EA0A3",
   }),
   multiValueLabel: (base) => ({
     ...base,
-    color: "#1F2937", // Цвет текста выбранного значения
+    color: "#1F2937",
   }),
   multiValueRemove: (base) => ({
     ...base,
     color: "#ffffff",
     "&:hover": {
-      backgroundColor: "#ef4444", // Красная кнопка удаления
+      backgroundColor: "#ef4444",
       color: "white",
     },
   }),

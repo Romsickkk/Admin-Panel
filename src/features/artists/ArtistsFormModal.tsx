@@ -3,9 +3,9 @@ import { type ArtistData } from "./apiArtists";
 import ReactModal from "react-modal";
 import ArtistsForm from "./ArtistsForm";
 import Button from "../../ui/Button";
-import styled from "styled-components";
 
 import { type ModalType } from "./ArtistsAgGrid";
+import { ButtonContainer, modalStyles, WarningText } from "../styles/FormsStyles";
 
 interface ModalInterface {
   modalName: ModalType;
@@ -13,45 +13,6 @@ interface ModalInterface {
   currentArtist?: ArtistData | null;
 }
 ReactModal.setAppElement("#root");
-
-const modalStyles = {
-  overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    zIndex: 1000,
-  },
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    width: "400px",
-    padding: "20px",
-    background: "var(--color-grey-200)",
-    zIndex: 1010,
-    borderRadius: "8px",
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-    color: "#fff",
-    border: "none",
-  },
-};
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  width: 100%;
-`;
-
-const WarningText = styled.p`
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 function ArtistsFormModal({ modalName, onRequestClose, currentArtist }: ModalInterface) {
   const isOpen = !!modalName;

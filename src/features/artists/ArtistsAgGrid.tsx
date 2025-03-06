@@ -45,7 +45,7 @@ function ArtistsAgGrid() {
         <AddButton changeModal={openModal} name="Artist" />
       </div>
 
-      <AgGridWrapper className="ag-theme-alpine-dark">
+      <AgGridWrapper>
         <AgGridReact
           columnDefs={aritstsColumnDefs}
           defaultColDef={{

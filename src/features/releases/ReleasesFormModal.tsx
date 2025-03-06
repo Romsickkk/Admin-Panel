@@ -1,11 +1,10 @@
-import { type ReleasesData } from "./apiReleases";
+import { ButtonContainer, modalStyles, WarningText } from "../styles/FormsStyles";
 
+import { type ReleasesData } from "./apiReleases";
 import { type ModalType } from "./ReleasesAgGrid";
 
-import ReactModal from "react-modal";
-
 import Button from "../../ui/Button";
-import styled from "styled-components";
+import ReactModal from "react-modal";
 import ReleasesForm from "./ReleasesForm";
 
 interface ModalInterface {
@@ -14,45 +13,6 @@ interface ModalInterface {
   currentReleases?: ReleasesData | null;
 }
 ReactModal.setAppElement("#root");
-
-const modalStyles = {
-  overlay: {
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    zIndex: 1000,
-  },
-  content: {
-    top: "50%",
-    left: "50%",
-    right: "auto",
-    bottom: "auto",
-    marginRight: "-50%",
-    transform: "translate(-50%, -50%)",
-    width: "400px",
-    padding: "20px",
-    background: "#1F2937",
-    zIndex: 1010,
-    borderRadius: "8px",
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.2)",
-    color: "#fff",
-    border: "none",
-  },
-};
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  width: 100%;
-`;
-
-const WarningText = styled.p`
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
 
 function ReleasesFormModal({ modalName, onRequestClose, currentReleases }: ModalInterface) {
   const isOpen = !!modalName;

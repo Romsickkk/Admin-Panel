@@ -3,21 +3,21 @@ import styled from "styled-components";
 const AgGridWrapper = styled.div`
   height: 513px;
   width: 100%;
-  background-color: #1f2937;
+  background-color: var(--color-grey-100);
   color: #ffffff;
 
-  &.ag-theme-alpine-dark {
-    --ag-background-color: #102a3f;
-    --ag-foreground-color: #ffffff;
-    --ag-header-background-color: #1a1a1a;
-    --ag-row-hover-color: #1a1a1a;
-    --ag-border-color: #333333;
-    --ag-secondary-border-color: #333333;
+  --ag-background-color: var(--color-grey-200);
+  --ag-foreground-color: var(--color-grey-800);
 
-    --ag-cell-background-color: #006aff;
+  --ag-header-background-color: var(--color-grey-100);
+  --ag-header-foreground-color: #00ff00;
+  --ag-row-hover-color: var(--color-grey-100);
+  --ag-border-color: #333333;
+  --ag-secondary-border-color: #333333;
 
-    --ag-odd-row-background-color: #1b2738;
-  }
+  --ag-cell-background-color: #006aff;
+  --ag-alpine-active-color: #550000;
+  --ag-odd-row-background-color: var(--color-grey-300);
 `;
 
 export default AgGridWrapper;

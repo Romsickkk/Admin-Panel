@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { updateNewImage } from "../../aggrid/updateNewImage";
+
 import { useForm } from "react-hook-form";
 
 import { useGetTableDataQuery, useUpdateArtistByIdMutation } from "./apiArtists";
-import { useDeleteImageMutation, useUpdateImageMutation } from "../../services/apiArtistAvatar";
 
 import { type ArtistData } from "./apiArtists";
 
@@ -25,6 +24,8 @@ import {
   RoundAvatar,
   UploadIcon,
 } from "../styles/FormsStyles";
+
+import useChangeImage from "../services/useChangeImage";
 
 interface FormData {
   name: string;
@@ -48,8 +49,8 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [newAvatar, setNewAvatar] = useState<string>(avatar || DefaultAvatar);
   const [avatarChanged, setAvatarChanged] = useState<boolean>(false);
-  const [updateImage, { isLoading: isLoadingImage }] = useUpdateImageMutation();
-  const [deleteImage] = useDeleteImageMutation();
+  const [isLoadingImage, setIsLoadingImage] = useState<boolean>(false);
+
   const [updateArtistById, { isLoading }] = useUpdateArtistByIdMutation();
 
   const {
@@ -60,6 +61,8 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
   } = useForm<FormData>({
     defaultValues: { name, facebook, vk, spotify, soundcloud, instagram, twitter },
   });
+
+  const changeImage = useChangeImage({ avatar, avatarFile, setNewAvatar });
 
   function handleAvatarChange(event: React.ChangeEvent<HTMLInputElement>) {
     const files = event.target.files;
@@ -75,9 +78,10 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
 
   async function onSubmit(data: FormData) {
     if (format === "Add") {
-      console.log("Entered data:", { ...data, newAvatar });
       reset();
       onRequestClose();
+      refetch();
+      toast.success("Artist created");
       return;
     }
 
@@ -90,20 +94,9 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
       }
 
       if (avatarChanged && avatarFile) {
-        try {
-          await updateNewImage(avatarFile, setNewAvatar, updateImage);
-
-          if (avatar) {
-            const fileName = avatar.split("/").pop();
-
-            if (fileName) {
-              await deleteImage({ storageName: "artistsAvatars", fileName });
-            }
-          }
-        } catch (error) {
-          console.log("Ошибка загрузки нового аватара:", error);
-          return;
-        }
+        setIsLoadingImage(true);
+        await changeImage();
+        setIsLoadingImage(false);
       }
       const newData: ArtistData = {
         ...currentArtist,
@@ -122,10 +115,12 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
         }
       }
       toast.success("Artist information updated.");
+
       reset();
       onRequestClose();
+      refetch();
+      return;
     }
-    refetch();
   }
 
   return (
@@ -141,7 +136,7 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
 
       {["name", "facebook", "vk", "spotify", "soundcloud", "instagram", "twitter"].map((field) => (
         <div key={field}>
-          <Label>{field.charAt(0).toUpperCase() + field.slice(1)}</Label>
+          <Label>{field.length > 3 ? field.charAt(0).toUpperCase() + field.slice(1) : field.toUpperCase()}</Label>
           <InputField
             {...register(field as keyof FormData, {
               required: field === "name" ? `${field} is compulsory` : false,
@@ -160,11 +155,17 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
       ))}
 
       <ButtonContainer>
-        <Button $variations="secondary" $size="medium" type="button" disabled={isLoading} onClick={onRequestClose}>
+        <Button
+          $variations="secondary"
+          $size="medium"
+          type="button"
+          disabled={isLoading || isLoadingImage}
+          onClick={onRequestClose}
+        >
           Cancel
         </Button>
         <Button $variations="primary" $size="medium" type="submit" disabled={isLoading || isLoadingImage}>
-          {isLoading ? "Saving..." : "Save"}
+          {isLoading || isLoadingImage ? "Saving..." : "Save"}
         </Button>
       </ButtonContainer>
     </FormContainer>

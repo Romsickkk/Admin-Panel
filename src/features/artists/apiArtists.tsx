@@ -14,6 +14,8 @@ export type ArtistData = {
   twitter: string | undefined;
 };
 
+type NewArtist = Omit<ArtistData, "id">;
+
 export const apiArtists = createApi({
   reducerPath: "apiArtists",
   baseQuery: fetchBaseQuery({ baseUrl: "" }),
@@ -46,6 +48,38 @@ export const apiArtists = createApi({
         return { data: formattedData };
       },
     }),
+    isHaveArtist: builder.query<number, number>({
+      queryFn: async (id: number) => {
+        const { data, error } = await supabase.from("artists").select("id").eq("id", id);
+
+        if (error) {
+          return {
+            error: {
+              status: error.code ? parseInt(error.code) : 500,
+              data: error.message,
+            },
+          };
+        }
+
+        return { data: data.length };
+      },
+    }),
+    uploadNewArtist: builder.mutation<any, { id: number; newData: NewArtist }>({
+      async queryFn({ newData }) {
+        try {
+          const { error } = await supabase.from("artists").insert(newData);
+          if (error) {
+            return { error: { status: 500, data: error.message } };
+          }
+          return { data: "Artist added successfully" };
+        } catch (error) {
+          return {
+            error: { status: 500, data: error instanceof Error ? error.message : "Unknown error" },
+          };
+        }
+      },
+    }),
+
     updateArtistById: builder.mutation<any, { id: number; newData: ArtistData }>({
       async queryFn({ id, newData }) {
         try {
@@ -76,4 +110,5 @@ export const apiArtists = createApi({
   }),
 });
 
-export const { useGetTableDataQuery, useUpdateArtistByIdMutation } = apiArtists;
+export const { useGetTableDataQuery, useIsHaveArtistQuery, useUploadNewArtistMutation, useUpdateArtistByIdMutation } =
+  apiArtists;

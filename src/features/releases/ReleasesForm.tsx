@@ -15,7 +15,7 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import useSelectData from "../../ui/useSelectData";
 import DefaultAvatar from "../../assets/default-avatar.png";
-import { selectStyles } from "../../ui/selectStyles";
+import { selectStyles } from "../styles/selectStyles";
 import {
   AvatarContainer,
   AvatarWrapper,

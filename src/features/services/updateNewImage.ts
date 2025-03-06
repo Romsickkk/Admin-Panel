@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import supabase from "../services/supabase";
+import supabase from "../../services/supabase";
 
 export async function updateNewImage(file: File, setNewAvatar: (url: string) => void, updateImage: any) {
   const fileName = `${crypto.randomUUID()}_${file.name}`;
