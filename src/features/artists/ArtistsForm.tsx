@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { useForm } from "react-hook-form";
 
-import { useGetTableDataQuery, useUpdateArtistByIdMutation } from "./apiArtists";
+import { useGetTableDataQuery, useUpdateArtistByIdMutation, useUploadNewArtistMutation } from "./apiArtists";
 
 import { type ArtistData } from "./apiArtists";
 
@@ -26,6 +26,7 @@ import {
 } from "../styles/FormsStyles";
 
 import useChangeImage from "../services/useChangeImage";
+import useUniqueId from "../services/useUnicId";
 
 interface FormData {
   name: string;
@@ -50,8 +51,9 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
   const [newAvatar, setNewAvatar] = useState<string>(avatar || DefaultAvatar);
   const [avatarChanged, setAvatarChanged] = useState<boolean>(false);
   const [isLoadingImage, setIsLoadingImage] = useState<boolean>(false);
-
+  const { newId } = useUniqueId();
   const [updateArtistById, { isLoading }] = useUpdateArtistByIdMutation();
+  const [uploadNewArtist, { isLoading: isUploading }] = useUploadNewArtistMutation();
 
   const {
     register,
@@ -77,11 +79,19 @@ function ArtistsForm({ format, currentArtist, onRequestClose }: UserFormProps) {
   }
 
   async function onSubmit(data: FormData) {
-    if (format === "Add") {
-      reset();
-      onRequestClose();
-      refetch();
-      toast.success("Artist created");
+    if (format === "Add" && newId !== null) {
+      try {
+        // Передаем ID только если newId не null
+        uploadNewArtist({ id: newId, newData: data });
+        toast.success("Artist created");
+      } catch (error) {
+        console.error("Ошибка при добавлении артиста", error);
+        toast.error("Failed to create artist");
+      } finally {
+        reset();
+        onRequestClose();
+        refetch();
+      }
       return;
     }
 

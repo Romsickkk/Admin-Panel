@@ -14,7 +14,7 @@ export type ArtistData = {
   twitter: string | undefined;
 };
 
-type NewArtist = Omit<ArtistData, "id">;
+type NewArtist = Omit<ArtistData, "id" | "avatar">;
 
 export const apiArtists = createApi({
   reducerPath: "apiArtists",
